@@ -3,30 +3,31 @@ const aws = require('aws-sdk');
 
 const docClient = new aws.DynamoDB.DocumentClient();
 
-const reportPrecinctVotes = voteData => {
-    console.log(`voteData: ${voteData}`);
+const reportPrecinctVotes = async voteData => {
+    console.log(`voteData: ${JSON.stringify(voteData)}`);
     const state = voteData.state;
     const precinct = voteData.precinct;
     const county = voteData.county;
+    const voteJson = JSON.stringify(voteData);
 
     var params = {
         TableName: 'precinct_votes',
         Item: {
-            'state' : {S: state},        
-            'precinct' : {S: precinct},
-            'county' : {S: county},
-            'voteData' : voteData
+            'state' : state,        
+            'precinct' : precinct,
+            'county' : county,
+            'voteData' : voteJson
         }
     };
 
     let response;
         
-    docClient.put(params, function(err, data) {
+    return new Promise( (resolve, reject ) =>  docClient.put(params, function(err, data) {
         if (err) {
             console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
             response = {
                 success: false,
-                errorResopnse: err
+                errorResponse: err
             }   
         } else {
             console.log("Added item:", JSON.stringify(data, null, 2));
@@ -34,9 +35,7 @@ const reportPrecinctVotes = voteData => {
                 success: true                
             }
         }
-    });
-
-    return response;
+    }));    
 }
 
 const getStateVotes = async state => {

@@ -11,8 +11,11 @@ function buildResponse(body, success) {
 
 module.exports = {
   reportPrecinctVotes: async event => {    
+    console.log(`event body: ${event.body}`);
     const voteData = JSON.parse(event.body);
-    const resp = votes.reportPrecinctVotes(voteData);
+    
+    const resp = await votes.reportPrecinctVotes(voteData);
+    console.log(`response: ${resp}`);
     return buildResponse(resp, resp.success);
   },
   
