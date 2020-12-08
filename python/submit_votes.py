@@ -23,7 +23,7 @@ def submitPrecinctVotes(precinct, state):
         'county': precinct['county'],
         'voteData': precinct
         }
-    r = requests.post(url, data=payload)    
+    r = requests.post(url, data=json.dumps(payload))
     print(r)
 
 def submitVotes(state, delay):
