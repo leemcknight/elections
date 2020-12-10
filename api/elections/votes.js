@@ -1,5 +1,6 @@
 const { rejects } = require('assert');
 const aws = require('aws-sdk');
+const {convertStateResponse} = require('./dynamoHelper');
 
 const docClient = new aws.DynamoDB.DocumentClient();
 
@@ -8,7 +9,7 @@ const reportPrecinctVotes = async voteData => {
     const state = voteData.state;
     const precinct = voteData.precinct;
     const county = voteData.county;
-    const voteJson = JSON.stringify(voteData);
+    const voteJson = JSON.stringify(voteData.voteData);
 
     var params = {
         TableName: 'precinct_votes',
@@ -28,12 +29,13 @@ const reportPrecinctVotes = async voteData => {
             response = {
                 success: false,
                 errorResponse: err
-            }   
-        } else {
-            console.log("Added item:", JSON.stringify(data, null, 2));
+            } 
+            reject(err);
+        } else {            
             response = {
                 success: true                
             }
+            resolve(response);
         }
     }));    
 }
@@ -42,7 +44,7 @@ const getStateVotes = async state => {
     //get all records for state
     var params = {
         TableName: 'precinct_votes',
-        KeyConditionExpression: '#state = :state',
+        FilterExpression: '#state = :state',
         ExpressionAttributeNames: {
             '#state': 'state'
         },
@@ -51,45 +53,23 @@ const getStateVotes = async state => {
         }
     }
 
-    docClient.query(params, (err, data) => {
+    const result = await new Promise( (resolve, reject) => docClient.scan(params, (err, data) => {
         if(err) {
             reject(err);
-        } else {            
-            const precincts = data.Items;
-            console.log(precincts);
+        } else {                    
+            console.log(`data: ${data}`);
+            resolve(data.Items);
         }
-    });
+    }));
 
-    //iterate over votes
-    let countyResults = [];
-    for(precinct of precincts) {
-        const precinctCounty = precinct.county;
-        const countyRecord = countyResults.find(county => county.county == precinctCounty);
-        if(!countyRecord) {
-            countyRecord = {
-                county: precinctCounty,
-                precinctCount: precinct.countyPrecinctCount,
-                precictsReporting: 0
-            }                
-        }
+    const precincts = convertStateResponse(result);
 
-        const precinctsReporting = countyRecord.precictsReporting + 1;
-        countryRecord.candidates;
-
-
-        const precinct = precinct.precinct;
-        countyResults.push({
-
-        })
-        //candidates[precinct.]
-    }
-
-    const result = {
+    const stateResult = {
         state: state,
-        counties: countyResults
+        counties: precincts
     };
 
-    return result;
+    return stateResult;
 }
 
 const getNationwideTotals = () => {

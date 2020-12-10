@@ -16,11 +16,11 @@ def getStateData(state):
         stateData = json.load(reader)
     return stateData
 
-def submitPrecinctVotes(precinct, state):
+def submitPrecinctVotes(county, precinctName, precinct, state):
     payload = {
         'state': state,
-        'precinct': precinct['name'],
-        'county': precinct['county'],
+        'precinct': precinctName,
+        'county': county,
         'voteData': precinct
         }
     r = requests.post(url, data=json.dumps(payload))
@@ -42,8 +42,8 @@ def submitVotes(state, delay):
         nextCounty = counties[index] 
         nextCountyName = nextCounty.name
         print('pulled random county: {}'.format(nextCountyName))
-        nextPrecinct = nextCounty.next_precinct_votes()
-        submitPrecinctVotes(nextPrecinct, state)
+        nextPrecinctName, nextPrecinct = nextCounty.next_precinct_votes()
+        submitPrecinctVotes(nextCountyName, nextPrecinctName, nextPrecinct, state)
         time.sleep(int(delay))
         counties_left = len(counties)
 

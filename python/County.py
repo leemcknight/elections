@@ -14,7 +14,5 @@ class County:
         index = random.randint(0, precinctsLeft - 1)
         nextPrecinctName = list(self.precincts.keys())[index] 
         nextPrecinct = self.precincts.pop(nextPrecinctName) 
-        nextPrecinct['name'] = nextPrecinctName
-        nextPrecinct['county'] = self.name
         print('pulled random precinct from {}: {}'.format(self.name, nextPrecinctName))
-        return nextPrecinct
+        return nextPrecinctName, nextPrecinct
