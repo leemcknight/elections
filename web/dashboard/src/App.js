@@ -25,6 +25,15 @@ function calcNationalTotals() {
 }
 
 function App() {
+
+  const calcNationalTotals = (stateTotals) => {
+    let votes = {};
+    console.log(stateTotals);
+    
+    return votes;
+}
+
+
   const geoUrl = "/geodata/us-albers.json"    
   const [nationalData, setNationalData] = useState(calcNationalTotals());
   const [selectedState, setSelectedState] = useState('FL');
@@ -38,9 +47,31 @@ function App() {
     setSelectedState(null);
   }
 
-  const setGeoColor = (geography) => {
-    console.log(geography);
-    return "#ff0000";
+  const setGeoColor = (geography) => {    
+    let color = "ffffff";
+    const state = geography.properties.iso_3166_2;
+    let winner;
+    if(nationalData && nationalData[state]) {                
+        let winnerVotes;
+        const stateVotes = nationalData.states[state];
+        for(const candidate in stateVotes) {
+            if(!winner) {
+              winner = candidate;
+              winnerVotes = stateVotes[candidate];
+            } else if(stateVotes[candidate] > winnerVotes) {
+              winner = candidate;
+              winnerVotes = stateVotes[candidate];
+            }
+        }
+    } 
+
+    if(winner == 'clinton') {
+      color = '#0000ff';
+    } else if(winner == 'trump') {
+      color = '#ff0000';
+    }
+    
+    return color;
   }
 
   const stateReportingCallback = (state, voteData) => {
@@ -55,7 +86,7 @@ function App() {
             if(!stateData[candidateVotes.candidate]) {
               stateData[candidateVotes.candidate] = candidateVotes.candidate;
             } else {
-              stateData[candidateVotes.caandidate] += candidateVotes.candidate;
+              stateData[candidateVotes.candidate] += candidateVotes.candidate;
             }            
         }
     }

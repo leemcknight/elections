@@ -2,36 +2,30 @@ import Card from 'react-bootstrap/Card';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import React, { useState } from 'react';
 
-function calcPercentages(nationData) {
+function calcPercentages(nationData, candidateName) {
     let totalVotes = 0;
-    let percentageData = [];
-    let candidateVotes;
-    for(candidateVotes of nationData.votes) {
-        totalVotes += candidateVotes.voteCount;
+    let percentage = 0;
+    for (const candidate in nationData) {
+        totalVotes += nationData[candidate];
     }
 
-    for(candidateVotes of nationData.votes) {
-        percentageData.push(
-            {
-                percent: candidateVotes.voteCount / totalVotes,
-                candidateName: candidateVotes.candidateName                
-            }
-        )        
-    }
+    percentage = nationData[candidateName] / totalVotes;
 
-    return percentageData;
+    return percentage;
 }
 
 function NationwideTotals(props) {
-    const percentages = calcPercentages(props.totals);
-    return (
-        
+    const candidateKeys = Object.entries(props.totals);
+    console.log(`candidate Keys: ${candidateKeys}`);
+    const totals = props.totals;
+
+    return (        
             <ProgressBar>
-                {percentages.map(percentage => 
-                    (<ProgressBar now={percentage.percent} 
+                {candidateKeys.map(candidateKey => 
+                    (<ProgressBar now={calcPercentages(totals, candidateKey)} 
                                 variant="info"
-                                key={percentage.candidateName} 
-                                label={percentage.percent.toString() + '%'}></ProgressBar>)
+                                key={candidateKey} 
+                                label={(calcPercentages(totals, candidateKey) * 100).toString() + '%'}></ProgressBar>)
                 )}
             </ProgressBar>
         
