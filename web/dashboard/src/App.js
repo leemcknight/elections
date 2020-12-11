@@ -7,35 +7,10 @@ import React, { useState } from 'react';
 import NationwideTotals from './components/NationwideTotals';
 import StateModal from './pages/StateModal';
 
-function calcNationalTotals() {
-  return {
-    votes: [
-      {
-        candidateName: 'Hilary Clinton',
-        candidateLastName: 'Clinton',
-        voteCount: 12235323
-      },
-      {
-        candidateName: 'Donald Trump',
-        candidateLastName: 'Trump',
-        voteCount: 12343434
-      }
-    ]
-  };
-}
-
 function App() {
 
-  const calcNationalTotals = (stateTotals) => {
-    let votes = {};
-    console.log(stateTotals);
-    
-    return votes;
-}
-
-
   const geoUrl = "/geodata/us-albers.json"    
-  const [nationalData, setNationalData] = useState(calcNationalTotals());
+  const [nationalData, setNationalData] = useState({states: {}});
   const [selectedState, setSelectedState] = useState('FL');
 
   const onGeographyClick = geography => event => {
@@ -47,27 +22,31 @@ function App() {
     setSelectedState(null);
   }
 
-  const setGeoColor = (geography) => {    
+  const setGeoColor = (geography) => {        
     let color = "ffffff";
     const state = geography.properties.iso_3166_2;
+    console.log(`set Geo Color for ${state}`);
     let winner;
     if(nationalData && nationalData[state]) {                
         let winnerVotes;
         const stateVotes = nationalData.states[state];
         for(const candidate in stateVotes) {
             if(!winner) {
+              console.log(`setting winner to ${winner}`);
               winner = candidate;
               winnerVotes = stateVotes[candidate];
             } else if(stateVotes[candidate] > winnerVotes) {
+              console.log(`setting winner to ${winner}`);
               winner = candidate;
               winnerVotes = stateVotes[candidate];
             }
         }
     } 
 
-    if(winner == 'clinton') {
+    //console.log(`winner of ${state} so far is ${winner}`);
+    if(winner === 'clinton') {
       color = '#0000ff';
-    } else if(winner == 'trump') {
+    } else if(winner === 'trump') {
       color = '#ff0000';
     }
     
@@ -75,26 +54,28 @@ function App() {
   }
 
   const stateReportingCallback = (state, voteData) => {
+    console.log(`state reporting callback for ${state}`);
+    console.log(voteData);
     if(!voteData) {
       return;
-    }
-    console.log(voteData);
-    let data = nationalData;
+    }    
+    
     let stateData = {}
-    for(const county in voteData.counties) {
-        for(const candidateVotes in county.voteData) {
-            if(!stateData[candidateVotes.candidate]) {
-              stateData[candidateVotes.candidate] = candidateVotes.candidate;
+    for(const county in voteData.counties) {      
+      for(const candidateVotes in voteData.counties[county].votes) {            
+            const numVotes = parseInt(voteData.counties[county].votes[candidateVotes]);            
+            if(!stateData[candidateVotes]) {
+              stateData[candidateVotes] = numVotes;
             } else {
-              stateData[candidateVotes.candidate] += candidateVotes.candidate;
+              stateData[candidateVotes] += numVotes;
             }            
         }
     }
-    nationalData.states[state] = stateData;
-    
+    nationalData.states[state] = stateData;    
     setNationalData(nationalData);
   }
 
+  console.log('rendering...');
   return (
     <Container>
       <Row>

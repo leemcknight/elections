@@ -25,8 +25,7 @@ function StateModal(props) {
             const county = data.counties[countyName];
             if(!county) {                
                 return "#454545";
-            }
-            console.log(`${countyName} has vote data!`);
+            }            
             const votes = county.votes;
             if(votes.trump > votes.clinton) {
                 return "#ff0000";
@@ -52,7 +51,7 @@ function StateModal(props) {
     }
     
     if(data) {
-        reportingCallback(data);        
+        reportingCallback(state, data);
         return (            
             <Modal show={props.showModal} 
                     onHide={props.onHide} 
