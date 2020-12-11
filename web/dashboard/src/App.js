@@ -25,7 +25,7 @@ function App() {
   const setGeoColor = (geography) => {        
     let color = "ffffff";
     const state = geography.properties.iso_3166_2;
-    console.log(`set Geo Color for ${state}`);
+    //console.log(`set Geo Color for ${state}`);
     let winner;
     if(nationalData && nationalData[state]) {                
         let winnerVotes;
@@ -54,15 +54,17 @@ function App() {
   }
 
   const stateReportingCallback = (state, voteData) => {
-    console.log(`state reporting callback for ${state}`);
-    console.log(voteData);
+    console.log(`state reporting callback for ${state}`);    
     if(!voteData) {
       return;
     }    
     
     let stateData = {}
+    let changes = false;
+    let candidates = [];
     for(const county in voteData.counties) {      
       for(const candidateVotes in voteData.counties[county].votes) {            
+            candidates.push(candidateVotes);
             const numVotes = parseInt(voteData.counties[county].votes[candidateVotes]);            
             if(!stateData[candidateVotes]) {
               stateData[candidateVotes] = numVotes;
@@ -71,8 +73,22 @@ function App() {
             }            
         }
     }
-    nationalData.states[state] = stateData;    
-    setNationalData(nationalData);
+    const newNationalData = {
+      states: {}
+    }
+    newNationalData.states[state] = stateData;
+    console.log(`newNationalData: ${JSON.stringify(newNationalData)}`);
+    for(const candidate of candidates) {
+      if(newNationalData.state[state][candidate] !== nationalData.state[state][candidate]) {
+        changes = true;
+        break;
+      }
+    }
+
+    //if(changes) {
+      console.log(`setting national data to: ${JSON.stringify(newNationalData)}`);
+      setNationalData(newNationalData);
+    //}
   }
 
   console.log('rendering...');

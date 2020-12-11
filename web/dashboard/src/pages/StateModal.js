@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/esm/Container';
 import Row from 'react-bootstrap/esm/Row';
@@ -14,16 +14,29 @@ function StateModal(props) {
     const baseUrl = "https://ip6rswdf3m.execute-api.us-west-2.amazonaws.com/dev";
     const state = props.state;
     const headers = { Accept: "application/json" };    
-    const reportingCallback = props.reportingCallback;
+    const reportingCallback = props.reportingCallback;    
     
-    const {data, error, isPending } = useFetch(`${baseUrl}/votes/state/${state}`, {headers});    
+    //const {data, error, isPending } = useFetch(`${baseUrl}/votes/state/${state}`, {headers});
+    const [data, setData] = useState();
+    const [error, setError] = useState();
+    const [busy, setBusy] = useState(false);
     const url = "/geodata/" + state + ".json"
+    
+    useEffect(() => {
+        setBusy(true);
+        fetch(`${baseUrl}/votes/state/${state}`, {headers})
+            .then(result => result.json())
+            .then(result => { setData(result);
+                             reportingCallback(state, result);})
+            .catch(error => setError(error))
+            .finally(setBusy(false));
+    }, []);
     
     function getCountyColor(geography) {       
         const countyName = geography.properties.NAME;
-        if(data) {            
+        if(data) {                        
             const county = data.counties[countyName];
-            if(!county) {                
+            if(!county) {
                 return "#454545";
             }            
             const votes = county.votes;
@@ -50,8 +63,8 @@ function StateModal(props) {
         }    
     }
     
-    if(data) {
-        reportingCallback(state, data);
+
+    if(data) {        
         return (            
             <Modal show={props.showModal} 
                     onHide={props.onHide} 
@@ -90,7 +103,7 @@ function StateModal(props) {
                             </Col>
                         </Row>
                         <Row>
-                        <Button>Gather Precinct votes</Button>
+                        <Button>Refresh Precinct votes</Button>
                         </Row>                    
                     </Container>
                 </Modal.Body>
@@ -116,6 +129,7 @@ function StateModal(props) {
             <Modal show={props.showModal}>
                 <Modal.Header>Loading</Modal.Header>
                 <Modal.Body>
+                    
                     <Spinner>                             
                     </Spinner>                        
                 </Modal.Body>                

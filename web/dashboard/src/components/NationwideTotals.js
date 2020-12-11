@@ -16,7 +16,7 @@ function calcPercentages(nationData, candidateName) {
 
 function NationwideTotals(props) {
     const candidateKeys = Object.entries(props.totals);
-    console.log(`candidate Keys: ${candidateKeys}`);
+    //console.log(`candidate Keys: ${candidateKeys}`);
     const totals = props.totals;
 
     return (        
