@@ -1,9 +1,9 @@
-**Elections project
+##Elections project
 
-*Overview
-**Simulates election returns at a precinct level and provides and api layer and web (react) application to view election status county by county, state by state, or nationwide.
+#Overview
+##Simulates election returns at a precinct level and provides and api layer and web (react) application to view election status county by county, state by state, or nationwide.
 
-**Stack
+##Stack
 *API - nodeJS running in Lambda, managed by Serverless.  Fronted by API Gateway
 *Database - DynamoDb
 *Scripts - Python scripts that handle the following:

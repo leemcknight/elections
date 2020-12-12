@@ -31,8 +31,13 @@ function App() {
   }
 
   const setGeoColor = (geography) => {        
-    let color = "ffffff";
+
+    let color = "#505050";
     const state = geography.properties.iso_3166_2;
+
+    if(state === 'FL') {
+      console.log('coloring florida');
+    }
     
     let winner;
     if(nationalData && nationalData[state]) {                
@@ -60,18 +65,20 @@ function App() {
     return color;
   }
 
-  const stateReportingCallback = (state, voteData) => {
-    console.log(`state reporting callback for ${state}`);    
+  const stateReportingCallback = (state, voteData) => {    
     if(!voteData) {
       return;
     }    
     
     let stateData = {}    
     let candidates = [];
-    for(const county in voteData.counties) {      
-      for(const candidateVotes in voteData.counties[county].votes) {            
+    console.log(`iterating through counties for ${state}`);
+    const counties = voteData[state].counties;    
+    console.log(`there are ${counties.count} counties.`)
+    for(const county in counties) {      
+      for(const candidateVotes in counties[county].votes) {            
             candidates.push(candidateVotes);
-            const numVotes = parseInt(voteData.counties[county].votes[candidateVotes]);            
+            const numVotes = parseInt(counties[county].votes[candidateVotes]);            
             if(!stateData[candidateVotes]) {
               stateData[candidateVotes] = numVotes;
             } else {

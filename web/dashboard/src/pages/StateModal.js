@@ -6,8 +6,7 @@ import StateGague from '../components/StateGague';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-import { useFetch } from 'react-async';
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function StateModal(props) {
@@ -16,8 +15,6 @@ function StateModal(props) {
     const state = props.state;
     const headers = { Accept: "application/json" };    
     const reportingCallback = props.reportingCallback;    
-    
-    //const {data, error, isPending } = useFetch(`${baseUrl}/votes/state/${state}`, {headers});
     const [data, setData] = useState();
     const [error, setError] = useState();
     const [busy, setBusy] = useState(false);
@@ -28,7 +25,7 @@ function StateModal(props) {
         fetch(`${baseUrl}/votes/state/${state}`, {headers})
             .then(result => result.json())
             .then(result => { setData(result);
-                             reportingCallback(state, result);})
+                             props.reportingCallback(state, result);})
             .catch(error => setError(error))
             .finally(setBusy(false));
     }, [state]);
@@ -77,7 +74,8 @@ function StateModal(props) {
                     <Container>
                         <Row>
                             <Col>
-                                <ComposableMap projection="geoAlbersUsa">
+                                <ComposableMap projection="geoMercator">
+                                    <ZoomableGroup>
                                     <Geographies geography={url}>
                                         {({ geographies }) =>
                                         geographies.map(geo => {                                     
@@ -92,6 +90,7 @@ function StateModal(props) {
                                         })
                                         }
                                     </Geographies>
+                                    </ZoomableGroup>
                                 </ComposableMap>
                             </Col>
                         </Row>
