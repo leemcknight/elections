@@ -6,12 +6,20 @@ import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import React, { useState } from 'react';
 import NationwideTotals from './components/NationwideTotals';
 import StateModal from './pages/StateModal';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
 
+  const stateColor = {
+    'clinton': "#0000ff",
+    'trump': '#ff0000'
+  };
+
   const geoUrl = "/geodata/us-albers.json"    
   const [nationalData, setNationalData] = useState({states: {}});
-  const [selectedState, setSelectedState] = useState('FL');
+  const [selectedState, setSelectedState] = useState();
 
   const onGeographyClick = geography => event => {
     const state= geography.properties.iso_3166_2;
@@ -25,7 +33,7 @@ function App() {
   const setGeoColor = (geography) => {        
     let color = "ffffff";
     const state = geography.properties.iso_3166_2;
-    //console.log(`set Geo Color for ${state}`);
+    
     let winner;
     if(nationalData && nationalData[state]) {                
         let winnerVotes;
@@ -43,7 +51,6 @@ function App() {
         }
     } 
 
-    //console.log(`winner of ${state} so far is ${winner}`);
     if(winner === 'clinton') {
       color = '#0000ff';
     } else if(winner === 'trump') {
@@ -59,8 +66,7 @@ function App() {
       return;
     }    
     
-    let stateData = {}
-    let changes = false;
+    let stateData = {}    
     let candidates = [];
     for(const county in voteData.counties) {      
       for(const candidateVotes in voteData.counties[county].votes) {            
@@ -73,26 +79,16 @@ function App() {
             }            
         }
     }
-    const newNationalData = {
-      states: {}
-    }
-    newNationalData.states[state] = stateData;
-    console.log(`newNationalData: ${JSON.stringify(newNationalData)}`);
-    for(const candidate of candidates) {
-      if(newNationalData.state[state][candidate] !== nationalData.state[state][candidate]) {
-        changes = true;
-        break;
-      }
-    }
 
-    //if(changes) {
-      console.log(`setting national data to: ${JSON.stringify(newNationalData)}`);
-      setNationalData(newNationalData);
-    //}
+    const newNationalData = [...nationalData];
+    newNationalData.states[state] = stateData;
+    console.log(`setting national data to: ${JSON.stringify(newNationalData)}`);
+    setNationalData(newNationalData);
   }
 
   console.log('rendering...');
   return (
+    <>
     <Container>
       <Row>
         <Col>
@@ -114,13 +110,15 @@ function App() {
           </ComposableMap>
         </Col>
       </Row>
-      <Row className="border">
+      <Row>
         <Col lg={6} md={9} sm={12}>
             <NationwideTotals totals={nationalData}></NationwideTotals>
         </Col>
       </Row>
-      <StateModal showModal={selectedState != null} state={selectedState} onHide={handleModalClose} reportingCallback={stateReportingCallback} />    
+       
     </Container>
+    <StateModal showModal={selectedState != null} state={selectedState} onHide={handleModalClose} reportingCallback={stateReportingCallback} />       
+    </>
   );
 }
 

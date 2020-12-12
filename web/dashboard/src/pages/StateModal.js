@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { useFetch } from 'react-async';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function StateModal(props) {
     
@@ -67,19 +68,16 @@ function StateModal(props) {
     if(data) {        
         return (            
             <Modal show={props.showModal} 
-                    onHide={props.onHide} 
-                    size="lg"
-                    aria-labelledby="contained-modal-title-vcenter"
-                    centered>
-                <Modal.Header>
+                    onHide={props.onHide}                                         
+                    >
+                <Modal.Header closeButton>
                     <h3>{props.state}</h3>
                 </Modal.Header>
-                <Modal.Body>       
-                    
+                <Modal.Body>                           
                     <Container>
                         <Row>
                             <Col>
-                                <ComposableMap projection="geoAlbersUsa">
+                                <ComposableMap>
                                     <Geographies geography={url}>
                                         {({ geographies }) =>
                                         geographies.map(geo => {                                     
@@ -102,9 +100,6 @@ function StateModal(props) {
                                 <StateGague></StateGague>
                             </Col>
                         </Row>
-                        <Row>
-                        <Button>Refresh Precinct votes</Button>
-                        </Row>                    
                     </Container>
                 </Modal.Body>
                 <Modal.Footer>
