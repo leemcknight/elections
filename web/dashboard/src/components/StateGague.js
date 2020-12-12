@@ -20,12 +20,10 @@ function StateGague(props) {
         width: 250
     }
     return (    
-        <Card>
-            <Card.Header className="bg">{props.state}</Card.Header>
+        <Card>            
             <Card.Body>
-                <Card.Title>Card Title</Card.Title>
-                <GagueChart id={props.state} percent={text.candidateTwoPercentage} style={style}></GagueChart>            
-                
+                <Card.Title>Win Probability</Card.Title>
+                <GagueChart id={props.state} percent={text.candidateTwoPercentage} style={style}></GagueChart>                            
             </Card.Body>
         </Card>        
     );

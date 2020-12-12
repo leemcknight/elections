@@ -31,11 +31,11 @@ function StateModal(props) {
                              reportingCallback(state, result);})
             .catch(error => setError(error))
             .finally(setBusy(false));
-    }, []);
+    }, [state]);
     
-    function getCountyColor(geography) {       
-        const countyName = geography.properties.NAME;
-        if(data) {                        
+    function getCountyColor(geography) {               
+        const countyName = geography.properties.NAME;        
+        if(data) {                   
             const county = data.counties[countyName];
             if(!county) {
                 return "#454545";
@@ -77,7 +77,7 @@ function StateModal(props) {
                     <Container>
                         <Row>
                             <Col>
-                                <ComposableMap>
+                                <ComposableMap projection="geoAlbersUsa">
                                     <Geographies geography={url}>
                                         {({ geographies }) =>
                                         geographies.map(geo => {                                     
