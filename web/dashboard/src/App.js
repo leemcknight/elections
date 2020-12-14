@@ -6,8 +6,6 @@ import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import React, { useState } from 'react';
 import NationwideTotals from './components/NationwideTotals';
 import StateModal from './pages/StateModal';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import "bootstrap/dist/css/bootstrap.min.css";
 import _ from 'lodash';
 
