@@ -9,6 +9,7 @@ import StateModal from './pages/StateModal';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import "bootstrap/dist/css/bootstrap.min.css";
+import _ from 'lodash';
 
 function App() {
 
@@ -40,28 +41,23 @@ function App() {
     }
     
     let winner;
-    if(nationalData && nationalData[state]) {                
+    if(nationalData && nationalData.states[state]) {                
         let winnerVotes;
         const stateVotes = nationalData.states[state];
         for(const candidate in stateVotes) {
-            if(!winner) {
-              console.log(`setting winner to ${winner}`);
+            if(!winner) {              
               winner = candidate;
               winnerVotes = stateVotes[candidate];
-            } else if(stateVotes[candidate] > winnerVotes) {
-              console.log(`setting winner to ${winner}`);
+            } else if(stateVotes[candidate] > winnerVotes) {              
               winner = candidate;
               winnerVotes = stateVotes[candidate];
             }
         }
-    } 
-
-    if(winner === 'clinton') {
-      color = '#0000ff';
-    } else if(winner === 'trump') {
-      color = '#ff0000';
     }
-    
+
+    if(stateColor[winner]) {
+      color = stateColor[winner];    
+    }
     return color;
   }
 
@@ -71,25 +67,22 @@ function App() {
     }    
     
     let stateData = {}    
-    let candidates = [];
-    console.log(`iterating through counties for ${state}`);
-    const counties = voteData[state].counties;    
-    console.log(`there are ${counties.count} counties.`)
-    for(const county in counties) {      
+    let candidates = [];    
+    const counties = voteData.counties;    
+    for(const county in counties) {        
       for(const candidateVotes in counties[county].votes) {            
             candidates.push(candidateVotes);
             const numVotes = parseInt(counties[county].votes[candidateVotes]);            
-            if(!stateData[candidateVotes]) {
+            if(!stateData[candidateVotes]) {            
               stateData[candidateVotes] = numVotes;
-            } else {
+            } else {            
               stateData[candidateVotes] += numVotes;
             }            
         }
     }
-
-    const newNationalData = [...nationalData];
-    newNationalData.states[state] = stateData;
-    console.log(`setting national data to: ${JSON.stringify(newNationalData)}`);
+    
+    const newNationalData = _.clone(nationalData);    
+    newNationalData.states[state] = stateData;    
     setNationalData(newNationalData);
   }
 
