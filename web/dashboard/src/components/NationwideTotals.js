@@ -1,31 +1,49 @@
-import Card from 'react-bootstrap/Card';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import React, { useState } from 'react';
 
-function calcPercentages(nationData, candidateName) {
+const candidateColorKeys = {
+    'clinton': 'primary',
+    'trump': 'danger'
+}
+
+function calcPercentages(nationData) {
+    console.log(`nationData: ${JSON.stringify(nationData)}`);
+    let votes = {};    
     let totalVotes = 0;
-    let percentage = 0;
-    for (const candidate in nationData) {
-        totalVotes += nationData[candidate];
+    for(const state in nationData.states) {        
+        const stateData = nationData.states[state];        
+        for (const candidate in stateData) {            
+            let currentVotes = 0;
+            if(votes[candidate]) {
+                currentVotes = votes[candidate];
+            }
+            
+            totalVotes += parseInt(stateData[candidate]);
+            votes[candidate] = currentVotes + parseInt(stateData[candidate]);
+        }
     }
-
-    percentage = nationData[candidateName] / totalVotes;
-
-    return percentage;
+    console.log(`total votes: ${totalVotes}`);
+    console.log(`nationwide: ${JSON.stringify(votes)}`);
+    let percentages = {};
+    for(const candidate in votes) {
+        const candidatePercentage = votes[candidate] /  totalVotes;
+        percentages[candidate] = candidatePercentage * 100;
+    }
+    
+    return percentages;
 }
 
 function NationwideTotals(props) {
-    const candidateKeys = Object.entries(props.totals);
-    //console.log(`candidate Keys: ${candidateKeys}`);
-    const totals = props.totals;
-
+    const percentages = calcPercentages(props.totals);
+    console.log(`percentages = ${JSON.stringify(percentages)}`);
+    
     return (        
             <ProgressBar>
-                {candidateKeys.map(candidateKey => 
-                    (<ProgressBar now={calcPercentages(totals, candidateKey)} 
-                                variant="info"
+                {Object.keys(percentages).map(candidateKey => 
+                    (<ProgressBar now={percentages[candidateKey]} 
+                                variant={candidateColorKeys[candidateKey]}
                                 key={candidateKey} 
-                                label={(calcPercentages(totals, candidateKey) * 100).toString() + '%'}></ProgressBar>)
+                                label={(percentages[candidateKey]).toString() + '%'}></ProgressBar>)
                 )}
             </ProgressBar>
         

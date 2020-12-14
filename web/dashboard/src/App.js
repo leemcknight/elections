@@ -31,14 +31,9 @@ function App() {
     setSelectedState(null);
   }
 
-  const setGeoColor = (geography) => {        
-
+  const setGeoColor = (geography) => {
     let color = "#505050";
     const state = geography.properties.iso_3166_2;
-
-    if(state === 'FL') {
-      console.log('coloring florida');
-    }
     
     let winner;
     if(nationalData && nationalData.states[state]) {                
@@ -85,8 +80,7 @@ function App() {
     newNationalData.states[state] = stateData;    
     setNationalData(newNationalData);
   }
-
-  console.log('rendering...');
+  
   return (
     <>
     <Container>
