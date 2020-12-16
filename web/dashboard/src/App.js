@@ -19,6 +19,7 @@ function App() {
   const geoUrl = "/geodata/us-albers.json"    
   const [nationalData, setNationalData] = useState({states: {}});
   const [selectedState, setSelectedState] = useState();
+  const [registrations, setRegistratiosn] = useState();
 
   const onGeographyClick = geography => event => {
     const state= geography.properties.iso_3166_2;

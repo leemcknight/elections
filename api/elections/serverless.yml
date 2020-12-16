@@ -73,6 +73,12 @@ functions:
       - http:
           path: votes/report
           method: post
+  reportRegistrations:
+    handler: handler.reportRegistrations
+    events:
+      - http:
+          path: registrations/report
+          method: post
   getStateVotes:
     handler: handler.getStateVotes
     events:
@@ -88,6 +94,12 @@ functions:
     events:
       - http:
           path: votes/nation
+          method: get
+  getRegistrations:
+    handler: handler.getRegistrations
+    events:
+      - http:
+          path: registrations/state/{state}
           method: get
   getStateProbability:
     handler: handler.getStateProbability

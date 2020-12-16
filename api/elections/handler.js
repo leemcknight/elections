@@ -1,5 +1,6 @@
 'use strict';
 const votes = require('./votes');
+const registrations = require('./registrations');
 
 function buildResponse(body, success) {
   const code = success ? 200 : 500;
@@ -18,10 +19,24 @@ module.exports = {
     console.log(`response: ${resp}`);
     return buildResponse(resp, resp.success);
   },
+
+  reportRegistrations: async event => {
+    const registrationData = JSON.parse(event.body);
+    
+    const resp = await registrations.reportRegistrations(registrationData);
+    console.log(`response: ${resp}`);
+    return buildResponse(resp, resp.success);
+  },
   
   getStateVotes: async event => {
     const {state} = event.pathParameters;
     const resp = await votes.getStateVotes(state);    
+    return buildResponse(resp, true);
+  },
+
+  getRegistrations: async event => {
+    const {state} = event.pathParameters;
+    const resp = await registrations.getRegistrations(state);    
     return buildResponse(resp, true);
   },
   

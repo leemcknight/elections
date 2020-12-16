@@ -1,27 +1,16 @@
 
 
-function convertDynamoResponse(dynamoResponse) {    
-    let parks = [];
-    for (const item of dynamoResponse.Items) {        
-        let league;
-        let end;
-        if (item.league != undefined) {
-            league = item.league.S;
-        }
-        if (item.end != undefined) {
-            end = item.end.S;
-        }
-        parks.push({
-            city: item.city.S,
-            ballpark_id: item.ballpark_id.S,
-            end: end,
-            name: item.name.S,
-            league: league,
-            start: item.start.S,
-            state: item.state.S
+const convertRegistrationResponse = dynamoResponse => {    
+    let registrations = [];
+    for (const item of dynamoResponse) {        
+        registrations.push({
+            county: item.county,
+            state: item.state,
+            republican: item.republican,
+            democrat: item.democrat
         });        
     }
-    return parks;
+    return registrations;
 }
 
 const convertStateResponse = dynamoResult => {
@@ -57,5 +46,6 @@ const convertStateResponse = dynamoResult => {
 
 
 module.exports = {
-    convertStateResponse
+    convertStateResponse,
+    convertRegistrationResponse
 };

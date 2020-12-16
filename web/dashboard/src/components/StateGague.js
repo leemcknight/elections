@@ -14,6 +14,15 @@ function buildGagueText(props) {
 }
 
 function StateGague(props) {
+
+    const calcProbabilities = (registrationData, voteData) => {
+        let totalRegistrations = 0;
+        for(const registration of registrationData) {
+            totalRegistrations += registration.republican;
+            totalRegistrations += registration.democrat;
+        }
+    }
+
     const text = buildGagueText(props);
     const style = {
         height: 250,

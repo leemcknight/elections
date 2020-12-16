@@ -58,11 +58,11 @@ function NationwideTotals(props) {
                     </ProgressBar>
                 </Col>
             </Row>
-            <Row>
+            <Row className="border">
                 {Object.keys(votes).map(candidateKey => (
                         <>
-                        <Col border lg={6}><label>{candidateKey}</label></Col>
-                        <Col border lg={6}><label>{votes[candidateKey]}({percentages[candidateKey].toString() + '%'})</label></Col>                        
+                        <Col className="border" lg={6}><label>{candidateKey}</label></Col>
+                        <Col className="border" lg={6}><label>{votes[candidateKey]}({percentages[candidateKey].toString() + '%'})</label></Col>                        
                         </>))}
                 
             </Row>
