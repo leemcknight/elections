@@ -40,6 +40,42 @@ const reportRegistrations = async registrations => {
     }));    
 }
 
+const reportCountyTotals = async countyTotals => {
+    console.log(`county totals: ${JSON.stringify(countyTotals)}`);
+    const state = countyTotals.state;
+    const county = countyTotals.county;
+    const voteCount = countyTotals.voteCount;
+    const precinctCount = countyTotals.precinctCount;
+
+    var params = {
+        TableName: 'county_registrations',
+        Item: {
+            'state' : state,        
+            'county' : county,
+            'vote_count' : voteCount,
+            'precinct_count' : precinctCount
+        }
+    };
+
+    let response;
+        
+    return new Promise( (resolve, reject ) =>  docClient.put(params, function(err, data) {
+        if (err) {
+            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+            response = {
+                success: false,
+                errorResponse: err
+            } 
+            reject(err);
+        } else {            
+            response = {
+                success: true                
+            }
+            resolve(response);
+        }
+    }));    
+}
+
 const getRegistrations = async state => {
     //get all records for state
     var params = {

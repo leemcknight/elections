@@ -7,7 +7,9 @@ const convertRegistrationResponse = dynamoResponse => {
             county: item.county,
             state: item.state,
             republican: item.republican,
-            democrat: item.democrat
+            democrat: item.democrat,
+            precinctCount: item.precinct_count,
+            voteCount: item.vote_count
         });        
     }
     return registrations;

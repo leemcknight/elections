@@ -33,6 +33,9 @@ function StateModal(props) {
     function getCountyColor(geography) {               
         const countyName = geography.properties.NAME;        
         if(data) {                   
+            if(!data.counties) {
+                console.log(`data: ${JSON.stringify(data)}`);
+            }
             const county = data.counties[countyName];
             if(!county) {
                 return "#454545";
@@ -74,7 +77,7 @@ function StateModal(props) {
                     <Container>
                         <Row>
                             <Col>
-                                <ComposableMap projection="geoMercator">
+                                <ComposableMap projection="geoAlbers">
                                     <ZoomableGroup>
                                     <Geographies geography={url}>
                                         {({ geographies }) =>
