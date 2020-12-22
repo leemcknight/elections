@@ -106,5 +106,6 @@ const getRegistrations = async state => {
 
 module.exports = {
     getRegistrations,
-    reportRegistrations
+    reportRegistrations,
+    reportCountyTotals
 };

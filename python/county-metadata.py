@@ -6,12 +6,19 @@ import requests
 
 counties = {} 
 precincts = {}
-url = 'https://ip6rswdf3m.execute-api.us-west-2.amazonaws.com/dev/registrations/report'
+url = 'https://ip6rswdf3m.execute-api.us-west-2.amazonaws.com/dev/countyTotals/report'
 
-def postCountyTotals(county_totals):
+def postCountyTotals(state):
     for county in counties:
         print(county)
-        response = requests.post(url, data = json.dumps(county_totals))
+        print(counties[county])
+        totals = {
+            'state': state.upper(),
+            'county': county.upper(),
+            'voteCount': counties[county]['precinct_count'],
+            'precinctCount': counties[county]['precinct_count']
+        }
+        response = requests.post(url, data = json.dumps(totals))
         print(response)
 
 def addPrecinctData(data):
@@ -23,7 +30,6 @@ def addPrecinctData(data):
     else:
         precincts[data['precinct']] = 1
 
-    print(county + '/' + votes)
     countyData = counties.get(county)
     if countyData:
         currentVotes = int(countyData['vote_count'])
@@ -44,7 +50,7 @@ def loadFile(file, state):
         for vote in voteReader:
             if vote['state_postal'] == state:
                 addPrecinctData(vote)
-    postCountyTotals()
+    postCountyTotals(state)
 
 if __name__ == "__main__":
     loadFile(sys.argv[1], sys.argv[2])

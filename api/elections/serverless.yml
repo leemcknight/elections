@@ -79,6 +79,12 @@ functions:
       - http:
           path: registrations/report
           method: post
+  reportCountyTotals:
+    handler: handler.reportCountyTotals
+    events:
+      - http:
+          path: countyTotals/report
+          method: post
   getStateVotes:
     handler: handler.getStateVotes
     events:

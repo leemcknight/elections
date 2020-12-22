@@ -27,6 +27,14 @@ module.exports = {
     console.log(`response: ${resp}`);
     return buildResponse(resp, resp.success);
   },
+
+  reportCountyTotals : async event => {
+    const countyData = JSON.parse(event.body);
+    
+    const resp = await registrations.reportCountyTotals(countyData);
+    console.log(`response: ${resp}`);
+    return buildResponse(resp, resp.success);
+  },
   
   getStateVotes: async event => {
     const {state} = event.pathParameters;
