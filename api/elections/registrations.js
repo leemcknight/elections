@@ -49,17 +49,24 @@ const reportCountyTotals = async countyTotals => {
 
     var params = {
         TableName: 'county_registrations',
-        Item: {
-            'state' : state,        
-            'county' : county,
-            'vote_count' : voteCount,
-            'precinct_count' : precinctCount
-        }
+        Key: {
+            'state' : state,
+            'county' : county
+        },
+        UpdateExpression : "SET #vote_count =:vote_count, #precinct_count =:precinct_count",
+        ExpressionAttributeNames : {        
+        "#vote_count" : "vote_count",
+        "#precinct_count" : "precinct_count",
+        },
+        ExpressionAttributeValues : {            
+            ":vote_count" : voteCount,
+            ":precinct_count" : precinctCount
+        }        
     };
 
     let response;
         
-    return new Promise( (resolve, reject ) =>  docClient.put(params, function(err, data) {
+    return new Promise( (resolve, reject ) =>  docClient.update(params, function(err, data) {
         if (err) {
             console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
             response = {

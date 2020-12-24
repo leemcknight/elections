@@ -15,7 +15,7 @@ def postCountyTotals(state):
         totals = {
             'state': state.upper(),
             'county': county.upper(),
-            'voteCount': counties[county]['precinct_count'],
+            'voteCount': counties[county]['vote_count'],
             'precinctCount': counties[county]['precinct_count']
         }
         response = requests.post(url, data = json.dumps(totals))
