@@ -19,15 +19,10 @@ const convertStateResponse = dynamoResult => {
     let counties = {};
     console.log(`dynamo result: ${JSON.stringify(dynamoResult)}`);
     for(const item of dynamoResult) {        
-        const county = item.county;        
-        const voteData = JSON.parse(item.voteData);
-
-        for(const key in voteData) {
-            if(key == 'name' || key == 'county') {
-                delete voteData[key];
-            }
-        }
-
+        const county = item.county;  
+        console.log(`county=${county}, state=${item.state}, precinct=${item.precinct} voteData=${item.voteData}`);
+        const voteData = JSON.parse(item.voteData);        
+        
         if(!counties[county]) {
             counties[county] = {
                 precinctsReporting: 1,
@@ -36,7 +31,7 @@ const convertStateResponse = dynamoResult => {
         } else {
             let existingCounty = counties[county];
             existingCounty.precinctsReporting++;
-            for(key of voteData) {
+            for(key in voteData) {
                 //keys are candidate last names
                 existingCounty[key] += voteData[key];
             }

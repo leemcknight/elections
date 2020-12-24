@@ -57,7 +57,7 @@ const getStateVotes = async state => {
         if(err) {
             reject(err);
         } else {                    
-            console.log(`data: ${data}`);
+            console.log(`data: ${JSON.stringify(data)}`);
             resolve(data.Items);
         }
     }));

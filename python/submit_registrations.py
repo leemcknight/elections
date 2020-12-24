@@ -14,8 +14,8 @@ def submit_registration(state, county, republican_voters, democratic_voters):
             "republican": republican_voters,
             "democrat": democratic_voters
             }
-    response = requests.post(url, data = json.dumps(payload))
-    print(response)
+    #response = requests.post(url, data = json.dumps(payload))
+    print(payload)
 
 
 def submitRegistrations(state, registration_file):
