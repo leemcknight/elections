@@ -16,11 +16,9 @@ const convertRegistrationResponse = dynamoResponse => {
 }
 
 const convertStateResponse = dynamoResult => {
-    let counties = {};
-    console.log(`dynamo result: ${JSON.stringify(dynamoResult)}`);
+    let counties = {};    
     for(const item of dynamoResult) {        
-        const county = item.county;  
-        console.log(`county=${county}, state=${item.state}, precinct=${item.precinct} voteData=${item.voteData}`);
+        const county = item.county;          
         const voteData = JSON.parse(item.voteData);        
         
         if(!counties[county]) {

@@ -56,8 +56,7 @@ const getStateVotes = async state => {
     const result = await new Promise( (resolve, reject) => docClient.scan(params, (err, data) => {
         if(err) {
             reject(err);
-        } else {                    
-            console.log(`data: ${JSON.stringify(data)}`);
+        } else {                                
             resolve(data.Items);
         }
     }));
