@@ -8,7 +8,7 @@ const reportPrecinctVotes = async voteData => {
     console.log(`voteData: ${JSON.stringify(voteData)}`);
     const state = voteData.state;
     const precinct = voteData.precinct;
-    const county = voteData.county;
+    const county = voteData.county.toUpperCase();
     const voteJson = JSON.stringify(voteData.voteData);
 
     var params = {

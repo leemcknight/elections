@@ -13,31 +13,47 @@ function StateModal(props) {
     
     const baseUrl = "https://ip6rswdf3m.execute-api.us-west-2.amazonaws.com/dev";
     const state = props.state;
-    const headers = { Accept: "application/json" };    
-    const reportingCallback = props.reportingCallback;    
+    const headers = { Accept: "application/json" };        
     const [data, setData] = useState();
+    const [registrationData, setRegistrationData] = useState();
     const [error, setError] = useState();
     const [busy, setBusy] = useState(false);
     const url = "/geodata/" + state + ".json"
-    
+    let stateTotals;
+
+    function calcStateTotals(results) {
+        
+    }
+
+    function calcRegistrationTotals(results) {
+
+    }
+
     useEffect(() => {
         setBusy(true);
+        console.log(`getting votes for ${state}`);
         fetch(`${baseUrl}/votes/state/${state}`, {headers})
             .then(result => result.json())
             .then(result => { setData(result);
+                             calcStateTotals(result);
                              props.reportingCallback(state, result);})
+            .catch(error => setError(error))
+            .finally(setBusy(false));
+        
+        fetch(`${baseUrl}/registrations/state/${state}`, {headers})
+            .then(result => result.json())
+            .then(result => { setRegistrationData(result);
+                             calcRegistrationTotals(result);
+                             props.registrationReportingCallback(state, result);})
             .catch(error => setError(error))
             .finally(setBusy(false));
     }, [state]);
     
-    function getCountyColor(geography) {               
-        const countyName = geography.properties.NAME;        
-        if(data) {                   
-            if(!data.counties) {
-                console.log(`data: ${JSON.stringify(data)}`);
-            }
+    function getCountyColor(geography) {                       
+        const countyName = geography.properties.NAME.toUpperCase();
+        if(data) {                               
             const county = data.counties[countyName];
-            if(!county) {
+            if(!county) {            
                 return "#454545";
             }            
             const votes = county.votes;
@@ -49,19 +65,25 @@ function StateModal(props) {
                 return "#cecece";
             }
         } else {
-            return "#00ff00";
+            return "#0000ff";
         }
     }
 
     const onGeographyClick = geography => event => {        
+        const clickedCounty = geography.properties.NAME.toUpperCase();
         if(data) {
-            const votes = data.counties[geography.properties.NAME];
+            const votes = data.counties[clickedCounty];
             if(!votes) {
                 alert("No precincts reporting.");
             } else {
                 alert(JSON.stringify(votes));
             }
         }    
+
+        if(registrationData) {
+            const countyRegistrations = registrationData.filter(county => county.name === clickedCounty);
+            alert(JSON.stringify(countyRegistrations));
+        }
     }
     
 
@@ -96,7 +118,8 @@ function StateModal(props) {
                                     </ZoomableGroup>
                                 </ComposableMap>
                             </Col>
-                        </Row>
+                        </Row>                        
+                        
                         <Row>
                             <Col>
                                 <StateGague></StateGague>

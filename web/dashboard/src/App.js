@@ -19,7 +19,8 @@ function App() {
   const geoUrl = "/geodata/us-albers.json"    
   const [nationalData, setNationalData] = useState({states: {}});
   const [selectedState, setSelectedState] = useState();
-  const [registrations, setRegistratiosn] = useState();
+  const [registrationData, setRegistrationData] = useState();
+  const [stateData, setStateData] = useState();
 
   const onGeographyClick = geography => event => {
     const state= geography.properties.iso_3166_2;
@@ -60,7 +61,7 @@ function App() {
       return;
     }    
     
-    let stateData = {}    
+    let stateData = {}; 
     let candidates = [];    
     const counties = voteData.counties;    
     for(const county in counties) {        
@@ -78,6 +79,10 @@ function App() {
     const newNationalData = _.clone(nationalData);    
     newNationalData.states[state] = stateData;    
     setNationalData(newNationalData);
+  }
+
+  const registrationReportingCallback = (state, registrationData) => {
+
   }
   
   return (
@@ -110,7 +115,11 @@ function App() {
       </Row>
        
     </Container>
-    <StateModal showModal={selectedState != null} state={selectedState} onHide={handleModalClose} reportingCallback={stateReportingCallback} />       
+    <StateModal showModal={selectedState != null} 
+                state={selectedState} 
+                onHide={handleModalClose} 
+                reportingCallback={stateReportingCallback}
+                registrationReportingCallback={registrationReportingCallback} />       
     </>
   );
 }
