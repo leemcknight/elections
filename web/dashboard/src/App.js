@@ -82,7 +82,9 @@ function App() {
   }
 
   const registrationReportingCallback = (state, registrationData) => {
-
+      const newRegistrationData = _.clone(registrationData);
+      registrationData.states[state] = registrationData;
+      setRegistrationData(newRegistrationData);
   }
   
   return (

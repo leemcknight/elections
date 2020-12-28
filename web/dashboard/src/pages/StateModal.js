@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/esm/Container';
 import Row from 'react-bootstrap/esm/Row';
@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import "bootstrap/dist/css/bootstrap.min.css";
+import CountyResults from '../components/CountyResults';
 
 function StateModal(props) {
     
@@ -17,20 +18,31 @@ function StateModal(props) {
     const [data, setData] = useState();
     const [registrationData, setRegistrationData] = useState();
     const [error, setError] = useState();
-    const [busy, setBusy] = useState(false);
+    const [selectedCounty, setSelectedCounty] = useState();
+    const [busy, setBusy] = useState({
+        registrationData: false,
+        voteData: false
+    });
     const url = "/geodata/" + state + ".json"
     let stateTotals;
 
     function calcStateTotals(results) {
+
+    }
+
+    function calcRegistrationTotals(results) { 
         
     }
 
-    function calcRegistrationTotals(results) {
-
+    function isBusy() {
+        return (busy.registrationData || busy.voteData);
     }
 
     useEffect(() => {
-        setBusy(true);
+        setBusy({
+            registrationData: true,
+            voteData: true
+        });
         console.log(`getting votes for ${state}`);
         fetch(`${baseUrl}/votes/state/${state}`, {headers})
             .then(result => result.json())
@@ -52,7 +64,7 @@ function StateModal(props) {
     function getCountyColor(geography) {                       
         const countyName = geography.properties.NAME.toUpperCase();
         if(data) {                               
-            const county = data.counties[countyName];
+            const county = data.counties[countyName];            
             if(!county) {            
                 return "#454545";
             }            
@@ -70,24 +82,27 @@ function StateModal(props) {
     }
 
     const onGeographyClick = geography => event => {        
-        const clickedCounty = geography.properties.NAME.toUpperCase();
+        const clickedCounty = geography.properties.NAME.toUpperCase();        
+        let votes, countyRegistration;
         if(data) {
-            const votes = data.counties[clickedCounty];
-            if(!votes) {
-                alert("No precincts reporting.");
-            } else {
-                alert(JSON.stringify(votes));
-            }
+            votes = data.counties[clickedCounty];            
         }    
 
-        if(registrationData) {
-            const countyRegistrations = registrationData.filter(county => county.name === clickedCounty);
-            alert(JSON.stringify(countyRegistrations));
+        if(registrationData) {                        
+            const countyRegistrations = registrationData.filter(county => county.county === clickedCounty);
+            if(countyRegistrations && countyRegistrations.length > 0) {
+                countyRegistration = countyRegistrations[0];
+            }            
         }
+
+        setSelectedCounty({
+            voteData: votes,
+            registrationData: countyRegistration
+        });        
     }
     
 
-    if(data) {        
+    if(data && !isBusy()) {        
         return (            
             <Modal show={props.showModal} 
                     onHide={props.onHide}                                         
@@ -119,7 +134,11 @@ function StateModal(props) {
                                 </ComposableMap>
                             </Col>
                         </Row>                        
-                        
+                        <Row>
+                            <Col>
+                                <CountyResults county={selectedCounty} />
+                            </Col>
+                        </Row>
                         <Row>
                             <Col>
                                 <StateGague></StateGague>
@@ -132,8 +151,7 @@ function StateModal(props) {
                 </Modal.Footer>
             </Modal>
         );
-    } else if(error) {
-        console.log("returning error modal");
+    } else if(error) {        
         return (
             <Modal show={props.showModal} size="lg">
                 <Modal.Header>Error</Modal.Header>
@@ -143,13 +161,11 @@ function StateModal(props) {
                 </Modal.Footer>
             </Modal>
         )
-    } else {
-        console.log("returning spinner modal");
+    } else {    
         return (
             <Modal show={props.showModal}>
                 <Modal.Header>Loading</Modal.Header>
-                <Modal.Body>
-                    
+                <Modal.Body>                    
                     <Spinner>                             
                     </Spinner>                        
                 </Modal.Body>                
