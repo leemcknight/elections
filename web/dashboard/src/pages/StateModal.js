@@ -82,23 +82,23 @@ function StateModal(props) {
     }
 
     const onGeographyClick = geography => event => {        
-        const clickedCounty = geography.properties.NAME.toUpperCase();        
+        const clickedCounty = geography.properties.NAME.toUpperCase();
         let votes, countyRegistration;
         if(data) {
-            votes = data.counties[clickedCounty];            
-        }    
+            votes = data.counties[clickedCounty];
+        }
 
         if(registrationData) {                        
             const countyRegistrations = registrationData.filter(county => county.county === clickedCounty);
             if(countyRegistrations && countyRegistrations.length > 0) {
                 countyRegistration = countyRegistrations[0];
-            }            
+            }
         }
 
         setSelectedCounty({
             voteData: votes,
             registrationData: countyRegistration
-        });        
+        });
     }
     
 

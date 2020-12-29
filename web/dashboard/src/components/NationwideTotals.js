@@ -10,8 +10,7 @@ const candidateColorKeys = {
     'trump': 'danger'
 }
 
-function calcPercentages(nationData) {
-    console.log(`nationData: ${JSON.stringify(nationData)}`);
+function calcPercentages(nationData) {    
     let votes = {};    
     let totalVotes = 0;
     for(const state in nationData.states) {        
@@ -25,16 +24,12 @@ function calcPercentages(nationData) {
             totalVotes += parseInt(stateData[candidate]);
             votes[candidate] = currentVotes + parseInt(stateData[candidate]);
         }
-    }
-    console.log(`total votes: ${totalVotes}`);
-    console.log(`nationwide: ${JSON.stringify(votes)}`);
+    }    
     let percentages = {};
     for(const candidate in votes) {
         const candidatePercentage = votes[candidate] /  totalVotes;
         percentages[candidate] = (candidatePercentage * 100).toFixed(2);
     }
-    
-    
 
     return [percentages,        
             votes];
