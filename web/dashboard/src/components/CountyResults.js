@@ -25,8 +25,19 @@ function CountyResults(props) {
         if(!county) {
             return null;
         }
-        const candidateVotes = county.voteData.votes;
-        const precinctsReporting = county.voteData.precinctsReporting;
+        let candidateVotes = {};
+        let precinctsReporting = 0;
+        
+        if(county.voteData) {
+            candidateVotes = county.voteData.votes;
+            precinctsReporting = county.voteData.precinctsReporting;
+        }
+
+        let totalVotes = 0;
+        for(const voteKey in candidateVotes) {
+            totalVotes += parseInt(candidateVotes[voteKey]);
+        }
+
         const totalPrecincts = county.registrationData.precinctCount;
         const precinctPct = (parseInt(precinctsReporting) / parseInt(totalPrecincts) * 100).toFixed(2); 
         return (
@@ -35,7 +46,8 @@ function CountyResults(props) {
                     Object.keys(candidateVotes).map(key => (
                         <Row>
                             <Col>{key}</Col>
-                            <Col>{candidateVotes[key]}</Col>                            
+                            <Col>{candidateVotes[key]}</Col>
+                            <Col>{((parseInt(candidateVotes[key]) / totalVotes) * 100).toFixed(2)}%</Col>
                         </Row>))
                 }                
                 <Row>

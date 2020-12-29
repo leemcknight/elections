@@ -88,12 +88,12 @@ function StateModal(props) {
             votes = data.counties[clickedCounty];
         }
 
-        if(registrationData) {                        
-            const countyRegistrations = registrationData.filter(county => county.county === clickedCounty);
+        if(registrationData) {            
+            const countyRegistrations = registrationData.filter(county => county.county === clickedCounty);            
             if(countyRegistrations && countyRegistrations.length > 0) {
                 countyRegistration = countyRegistrations[0];
             }
-        }
+        } 
 
         setSelectedCounty({
             voteData: votes,
