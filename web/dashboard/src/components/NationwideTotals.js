@@ -1,5 +1,5 @@
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import React, { useState } from 'react';
+import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -36,8 +36,7 @@ function calcPercentages(nationData) {
 }
 
 function NationwideTotals(props) {
-    let [percentages, votes] = calcPercentages(props.totals);
-    console.log(`percentages = ${JSON.stringify(percentages)}`);
+    let [percentages, votes] = calcPercentages(props.totals);    
     
     return (        
         <Container>

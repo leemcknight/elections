@@ -20,10 +20,11 @@ function App() {
   const headers = { Accept: "application/json" };        
   const geoUrl = "/geodata/us-albers.json"    
   const [nationalData, setNationalData] = useState({states: {}});
-  const [selectedState, setSelectedState] = useState();
-  const [stateTotals, setStateTotals] = useState({});
-  const [selectedStateVotes, setSelectedStateVotes] = useState();
-  const [selecteStateRegistrations, setSelectedStateRegistrations] = useState();
+  const [selectedState, setSelectedState] = useState();  
+  const [voteTotals, setVoteTotals] = useState({});
+  const [registrationTotals, setRegistrationTotals] = useState({});
+  const [selectedStateVotes, setSelectedStateVotes] = useState({});
+  const [selectedStateRegistrations, setSelectedStateRegistrations] = useState({});
   const [error, setError] = useState();
   const [busy, setBusy] = useState({
     registrationData: false,
@@ -55,51 +56,58 @@ function App() {
         }));
   }, [selectedState]);
 
-  const addRegistrationData = (registrationData) => {
-      let newStateTotals = _.clone(stateTotals);      
-      console.log(`newStateTotals in registration data: ${newStateTotals}`)
-      if(!newStateTotals[selectedState]) {
-        console.log(`initializeing newStateTotals for ${selectedState}`);
-        newStateTotals[selectedState] = {};
-      }
-
-      newStateTotals[selectedState].registrationData = registrationData;
-      setStateTotals(newStateTotals);
-
-      setSelectedStateRegistrations(registrationData);      
+  const addRegistrationData = (registrationData) => {    
+    let newRegistrationTotals = _.clone(registrationTotals);
+    newRegistrationTotals[selectedState] = registrationData;
+    console.log('setting registration totals');
+    setRegistrationTotals(newRegistrationTotals);
+    console.log('setting selected registration totals');
+    setSelectedStateRegistrations(registrationData);
+    updateStatePercentages(selectedState);
   }
 
-  const addVoteData = (voteData) => {
-      let newStateTotals = _.clone(stateTotals);      
-      console.log(`newStateTotals in vote data: ${newStateTotals}`);
-      if(!newStateTotals[selectedState]) {
-        console.log(`initializeing newStateTotals for ${selectedState}`);
-        newStateTotals[selectedState] = {};
-      }
+  const addVoteData = (voteData) => {   
+    console.log('addVoteData');
+    let newVoteTotals = _.clone(voteTotals);            
+    console.log(`cloned voteTotals: ${JSON.stringify(newVoteTotals)}`);
+    if(!newVoteTotals[selectedState]) {
+      newVoteTotals[selectedState] = {};
+    }
 
-      newStateTotals[selectedState].voteData = voteData;
-      setStateTotals(newStateTotals);
+    newVoteTotals[selectedState] = voteData;
+    console.log(`setting vote totals to: ${JSON.stringify(voteData)}`);
+    setVoteTotals(newVoteTotals);
 
-      //update national totals
-      let stateData = {}; 
-      let candidates = [];    
-      const counties = voteData.counties;    
-      for(const county in counties) {
-        for(const candidateVotes in counties[county].votes) {            
-              candidates.push(candidateVotes);
-              const numVotes = parseInt(counties[county].votes[candidateVotes]);            
-              if(!stateData[candidateVotes]) {            
-                stateData[candidateVotes] = numVotes;
-              } else {            
-                stateData[candidateVotes] += numVotes;
-              }            
-          }
-      }      
-      const newNationalData = _.clone(nationalData);    
-      newNationalData.states[selectedState] = stateData;    
-      setNationalData(newNationalData);
-      
-      setSelectedStateVotes(voteData);      
+    //update national totals
+    let stateData = {}; 
+    let candidates = [];    
+    const counties = voteData.counties;    
+    for(const county in counties) {
+      for(const candidateVotes in counties[county].votes) {            
+            candidates.push(candidateVotes);
+            const numVotes = parseInt(counties[county].votes[candidateVotes]);            
+            if(!stateData[candidateVotes]) {            
+              stateData[candidateVotes] = numVotes;
+            } else {            
+              stateData[candidateVotes] += numVotes;
+            }            
+        }
+    }      
+    const newNationalData = _.clone(nationalData);    
+    newNationalData.states[selectedState] = stateData;
+    console.log('setting national data')    ;
+    setNationalData(newNationalData);
+    
+    console.log(`setting selectedStateVotes to: ${JSON.stringify(voteData)}`);
+    setSelectedStateVotes(voteData);     
+    updateStatePercentages(selectedState);
+  }
+
+  const updateStatePercentages = (state) => {    
+     const stateVoteTotals = voteTotals[state];
+     const stateRegistrationTotals = registrationTotals[state];
+     console.log(`vote totals for ${state}: ${JSON.stringify(stateVoteTotals)}`);
+     console.log(`registration totals for ${state}: ${JSON.stringify(stateRegistrationTotals)}`);
   }
 
   const onGeographyClick = geography => event => {
@@ -169,7 +177,7 @@ function App() {
     <StateModal showModal={selectedState != null} 
                 state={selectedState} 
                 onHide={handleModalClose} 
-                stateRegistrations={selecteStateRegistrations}
+                stateRegistrations={selectedStateRegistrations}
                 stateVotes={selectedStateVotes} />       
     </>
   );
