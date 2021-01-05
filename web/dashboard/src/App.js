@@ -7,7 +7,7 @@ import React, { useEffect, useState} from 'react';
 import NationwideTotals from './components/NationwideTotals';
 import StateModal from './pages/StateModal';
 import "bootstrap/dist/css/bootstrap.min.css";
-import _ from 'lodash';
+import _, { intersection, isInteger } from 'lodash';
 
 function App() {
 
@@ -26,6 +26,7 @@ function App() {
   const [selectedStateVotes, setSelectedStateVotes] = useState({});
   const [selectedStateRegistrations, setSelectedStateRegistrations] = useState({});
   const [error, setError] = useState();
+  const [showModal, setShowModal] = useState(false);
   const [busy, setBusy] = useState({
     registrationData: false,
     voteData: false
@@ -56,26 +57,41 @@ function App() {
         }));
   }, [selectedState]);
 
-  const addRegistrationData = (registrationData) => {    
-    let newRegistrationTotals = _.clone(registrationTotals);
-    newRegistrationTotals[selectedState] = registrationData;
-    console.log('setting registration totals');
-    setRegistrationTotals(newRegistrationTotals);
-    console.log('setting selected registration totals');
-    setSelectedStateRegistrations(registrationData);
+  useEffect(() => {
+    if(busy.registrationData || busy.voteData) {
+      return;
+    }
+    
+    //no longer busy.
     updateStatePercentages(selectedState);
+    setShowModal(true);
+
+  }, [busy]);
+
+  const addRegistrationData = (registrationData) => {    
+    if(!selectedState) {
+      console.log('no selected state.  not adding registration data.');
+      return;
+    }
+    console.log(`adding registration data for state ${selectedState}`);
+    let newRegistrationTotals = _.clone(registrationTotals);
+    newRegistrationTotals[selectedState] = registrationData;    
+    setRegistrationTotals(newRegistrationTotals);
+    setSelectedStateRegistrations(registrationData);
   }
 
-  const addVoteData = (voteData) => {   
-    console.log('addVoteData');
-    let newVoteTotals = _.clone(voteTotals);            
-    console.log(`cloned voteTotals: ${JSON.stringify(newVoteTotals)}`);
+  const addVoteData = (voteData) => {    
+    if(!selectedState) {
+      console.log('no selected state.  not adding registration data.');
+      return;
+    }
+    console.log(`adding vote data for state ${selectedState}`);
+    let newVoteTotals = _.clone(voteTotals);    
     if(!newVoteTotals[selectedState]) {
       newVoteTotals[selectedState] = {};
     }
 
-    newVoteTotals[selectedState] = voteData;
-    console.log(`setting vote totals to: ${JSON.stringify(voteData)}`);
+    newVoteTotals[selectedState] = voteData;    
     setVoteTotals(newVoteTotals);
 
     //update national totals
@@ -94,20 +110,65 @@ function App() {
         }
     }      
     const newNationalData = _.clone(nationalData);    
-    newNationalData.states[selectedState] = stateData;
-    console.log('setting national data')    ;
-    setNationalData(newNationalData);
-    
-    console.log(`setting selectedStateVotes to: ${JSON.stringify(voteData)}`);
-    setSelectedStateVotes(voteData);     
-    updateStatePercentages(selectedState);
+    newNationalData.states[selectedState] = stateData;    
+    setNationalData(newNationalData);    
+    setSelectedStateVotes(voteData);    
   }
 
-  const updateStatePercentages = (state) => {    
-     const stateVoteTotals = voteTotals[state];
-     const stateRegistrationTotals = registrationTotals[state];
-     console.log(`vote totals for ${state}: ${JSON.stringify(stateVoteTotals)}`);
-     console.log(`registration totals for ${state}: ${JSON.stringify(stateRegistrationTotals)}`);
+  const updateStatePercentages = (state) => {
+    if(!state) {
+      console.log('state not defined.  not updating state percentages.');
+      return;
+    } else {
+      console.log(`updating state percentages for ${state}`);
+    }  
+
+    const stateVoteTotals = voteTotals[state];
+    const stateRegistrationTotals = registrationTotals[state];
+    console.log(`stateRegistrationTotals: ${JSON.stringify(stateRegistrationTotals)}`);
+    console.log(`stateVoteTotals = ${JSON.stringify(stateVoteTotals)}`);
+
+    if(!stateVoteTotals) {
+      console.log(`no state vote totals found for ${state}`);
+      return;
+    }
+
+    if(!stateRegistrationTotals) {
+      console.log(`no registration totals found for ${state}`);
+      return;
+    }
+    
+    let outstandingVote = 0;
+    let actualDem = 0;
+    let actualRep = 0;
+    let expectedDem = 0;
+    let expectedRep = 0;
+
+    for(const registrationData in stateRegistrationTotals) {
+        if(Object.keys(stateVoteTotals.counties).includes(registrationData.county)) {
+          //have votes for this county.
+          let votesIn = 0;
+          const candidateVotes = stateVoteTotals.counties[registrationData.county].votes;
+          for(const candidateKey in candidateVotes) {
+            votesIn += parseInt(candidateVotes[candidateKey]);
+            if(candidateKey.toUpperCase() === "CLINTON") {
+              actualDem += parseInt(candidateVotes[candidateKey]);
+            } else if(candidateKey.toUpperCase() === "TRUMP") {
+              actualRep += parseInt(candidateVotes[candidateKey]);
+            }
+          }
+          outstandingVote += parseInt(registrationData.voteCount) - votesIn;
+        } else {
+          //no votes yet for this county.
+          outstandingVote += parseInt(registrationData.voteCount);          
+        }        
+    }
+
+    const marginOfError = .03;
+
+    console.log(`outstanding votes for ${state}: ${outstandingVote}`);    
+    console.log(`actual/expected republican votes: ${actualRep}/${expectedRep}`);
+    console.log(`actual/expected democratic votes: ${actualDem}/${expectedDem}`);
   }
 
   const onGeographyClick = geography => event => {
@@ -116,7 +177,8 @@ function App() {
   }
 
   const handleModalClose = () => {
-    setSelectedState(null);
+    setShowModal(false);
+    setSelectedState(null);    
   }
 
   const setGeoColor = (geography) => {
@@ -174,7 +236,7 @@ function App() {
       </Row>
        
     </Container>
-    <StateModal showModal={selectedState != null} 
+    <StateModal showModal={showModal} 
                 state={selectedState} 
                 onHide={handleModalClose} 
                 stateRegistrations={selectedStateRegistrations}

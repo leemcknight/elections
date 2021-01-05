@@ -15,7 +15,11 @@ function CountyResults(props) {
 
     function renderCountyTitle() {
         if(county) {
-            return county.registrationData.county;
+            if(county.registrationData) {
+                return county.registrationData.county;
+            } else {
+                return "No data available for this county.";
+            }
         } else {
             return "Click a county to see county vote results";
         }
@@ -38,8 +42,13 @@ function CountyResults(props) {
             totalVotes += parseInt(candidateVotes[voteKey]);
         }
 
-        const totalPrecincts = county.registrationData.precinctCount;
-        const precinctPct = (parseInt(precinctsReporting) / parseInt(totalPrecincts) * 100).toFixed(2); 
+        let totalPrecincts = 0;
+        let precinctPct = 0;
+        if(county.registrationData) {
+            totalPrecincts = county.registrationData.precinctCount;
+            precinctPct = (parseInt(precinctsReporting) / parseInt(totalPrecincts) * 100).toFixed(2); 
+        }
+
         return (
             <Container>                
                 {                

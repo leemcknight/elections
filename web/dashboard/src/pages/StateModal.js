@@ -19,7 +19,11 @@ function StateModal(props) {
     function getCountyColor(geography) {                       
         const countyName = geography.properties.NAME.toUpperCase();
         
-        if(stateVotes) {                               
+        if(stateVotes) {          
+            if(!stateVotes.counties) {
+                console.log(`counties is undefined in ${JSON.stringify(stateVotes)}`);
+                return;
+            }                     
             const county = stateVotes.counties[countyName];            
             if(!county) {            
                 return "#454545";
@@ -40,7 +44,7 @@ function StateModal(props) {
     const onGeographyClick = geography => event => {        
         const clickedCounty = geography.properties.NAME.toUpperCase();
         let votes, countyRegistration;
-        if(stateVotes) {
+        if(stateVotes) {            
             votes = stateVotes.counties[clickedCounty];
         }
 
